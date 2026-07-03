@@ -52,7 +52,7 @@
  *   baru, script otomatis mengisinya saat sinkron berikutnya.
  */
 
-const FAMILY_CODE = 'GANTI-KODE-INI'; // <-- WAJIB DIGANTI sebelum deploy!
+const FAMILY_CODE = 'plokiju14'; // <-- WAJIB DIGANTI sebelum deploy!
 const SHEET_NAME = 'TRANSAKSI';       // <-- Ganti kalau nama tab Anda berbeda
 const SETTINGS_SHEET = 'AppSettings';
 const VERSION_KEY = 'dataVersion';
@@ -68,7 +68,7 @@ function _jsonResponse_(obj) {
   return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);
 }
 function _checkCode_(code) {
-  return code && FAMILY_CODE !== 'GANTI-KODE-INI' && code === FAMILY_CODE;
+  return code && FAMILY_CODE !== 'plokiju14' && code === FAMILY_CODE;
 }
 function _getTxSheet_() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
