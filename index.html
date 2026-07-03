@@ -195,7 +195,7 @@
 <div class="modal-overlay" id="quickModal"><div class="modal-content"><div class="quick-header"><div class="quick-header-left"><div class="cat-icon-badge" id="qIconBadge">📦</div><div><p class="font-bold text-lg text-slate-800" id="qCatName">Kategori</p><span class="type-badge" id="qTypeBadge">-</span></div></div><button class="btn btn-outline" style="padding:.25rem .5rem" onclick="App.closeQuickModal()">✕</button></div><div class="voice-banner" id="qVoiceBanner" onclick="Voice.startInModal()"><span class="voice-banner-icon" id="qVoiceBannerIcon">🎤</span><div class="voice-banner-text"><strong>Input Suara Sekaligus</strong><br>Contoh: <em>"kemarin beli ayam goreng di Lazzato seharga 15 ribu pakai Seabank"</em></div></div><div class="nlp-preview" id="nlpPreview"></div><form id="quickForm"><input type="hidden" id="qId"><input type="hidden" id="qType"><input type="hidden" id="qCategory"><div class="form-group" id="qCategoryGroup" style="display:none"><label>Kategori</label><select id="qCategorySelect" class="w-full"></select></div><div class="form-group"><label>Tanggal</label><input type="date" id="qDate" required></div><div class="form-group"><label>Keterangan <span class="font-normal text-slate-400">(opsional)</span></label><input type="text" id="qNote" placeholder="misal: Beli ayam goreng untuk makan siang"></div><div class="form-group"><label>Lokasi <span class="font-normal text-slate-400">(opsional)</span></label><input type="text" id="qLocation" placeholder="misal: Lazzato, Pangandaran"></div><div class="form-group"><label>Nominal (Rp)</label><input type="text" id="qNominal" inputmode="numeric" required placeholder="0"></div><div class="form-group"><label>Rekening</label><select id="qAccount" class="w-full"></select></div><div class="flex gap-2 mt-4"><button type="submit" class="btn btn-primary w-full">💾 Simpan</button><button type="button" class="btn btn-outline" id="qBtnDelete" style="color:var(--red-600);border-color:var(--red-100);display:none" onclick="App.deleteFromQuick()">Hapus</button></div></form></div></div>
 <div class="modal-overlay" id="addModal"><div class="modal-content"><div class="flex justify-between items-center mb-4"><h2 class="text-xl font-bold" id="modalTitle">Tambah Transaksi</h2><button class="btn btn-outline" style="padding:.25rem .5rem" onclick="App.closeAddModal()">✕</button></div><form id="addForm"><input type="hidden" id="modalId"><div class="tabs mb-4"><button type="button" class="tab active" data-val="pengeluaran" onclick="App.setModalType('pengeluaran')">Pengeluaran</button><button type="button" class="tab" data-val="pemasukan" onclick="App.setModalType('pemasukan')">Pemasukan</button></div><div class="form-group"><label>Tanggal</label><input type="date" id="modalTanggal" required></div><div class="form-group"><label>Kategori</label><div class="flex gap-2"><select id="modalKategori" required style="flex-grow:1"></select><button type="button" class="btn btn-outline" onclick="App.openCategoryModal()">⚙️</button></div></div><div class="form-group"><label>Keterangan <span class="font-normal text-slate-400">(opsional)</span></label><input type="text" id="modalCatatan" placeholder="Keterangan singkat"></div><div class="form-group"><label>Lokasi <span class="font-normal text-slate-400">(opsional)</span></label><input type="text" id="modalLocation" placeholder="Lokasi transaksi"></div><div class="form-group"><label>Nominal (Rp)</label><input type="text" id="modalNominal" inputmode="numeric" required placeholder="0"></div><div class="form-group"><label>Rekening</label><select id="modalAccount" class="w-full"></select></div><div class="flex gap-2 mt-4"><button type="submit" class="btn btn-primary w-full">Simpan</button><button type="button" class="btn btn-outline" style="color:var(--red-600);border-color:var(--red-100);display:none" id="btnDelete" onclick="App.deleteTransaction()">Hapus</button></div></form></div></div>
 <div class="modal-overlay" id="categoryModal"><div class="modal-content"><div class="flex justify-between items-center mb-4"><h2 class="text-xl font-bold">Kelola Kategori</h2><button class="btn btn-outline" style="padding:.25rem .5rem" onclick="document.getElementById('categoryModal').classList.remove('active')">✕</button></div><div class="tabs mb-4"><button class="tab cat-tab active" data-type="pengeluaran" onclick="App.switchCategoryTab(this,'pengeluaran')">Pengeluaran</button><button class="tab cat-tab" data-type="pemasukan" onclick="App.switchCategoryTab(this,'pemasukan')">Pemasukan</button></div><div class="flex gap-2 mb-4"><input type="text" id="newCategoryEmoji" placeholder="🍜" style="width:3.5rem;flex-shrink:0;text-align:center"><input type="text" id="newCategoryName" placeholder="Nama kategori baru" class="w-full"><button class="btn btn-primary" onclick="App.addCategory()">+</button></div><div id="categoryList" class="flex flex-col gap-2 max-h-60 overflow-y-auto"></div></div></div>
-<div class="modal-overlay" id="settingsModal"><div class="modal-content"><div class="flex justify-between items-center mb-4"><h2 class="text-xl font-bold">Pengaturan</h2><button class="btn btn-outline" style="padding:.25rem .5rem" onclick="document.getElementById('settingsModal').classList.remove('active')">✕</button></div><div class="form-group"><label>Tema</label><select id="themeSelect" onchange="Render.applyTheme(this.value)" class="w-full"><option value="light">🌞 Terang</option><option value="dark">🌙 Gelap</option><option value="auto">🔄 Otomatis (Sistem)</option></select></div><div class="form-group"><label>Rekening / Dompet</label><div class="flex gap-2 mb-2"><input type="text" id="newAccountName" placeholder="Nama rekening baru" class="w-full"><button class="btn btn-primary" onclick="App.addAccount()">+</button></div><div id="accountList" class="flex flex-col gap-2 max-h-40 overflow-y-auto"></div></div><div class="form-group"><label>Backup Data</label><button class="btn btn-primary w-full" onclick="App.backupData()">📥 Unduh Backup (JSON)</button></div><div class="form-group"><label>Restore Data</label><input type="file" id="restoreFileInput" accept=".json" style="display:none" onchange="App.restoreData(event)"><button class="btn btn-outline w-full" onclick="document.getElementById('restoreFileInput').click()">📂 Pilih File JSON</button></div><p class="text-xs text-slate-500 mt-2">Backup mencakup transaksi, kategori, rekening, dan anggaran.</p></div></div>
+<div class="modal-overlay" id="settingsModal"><div class="modal-content"><div class="flex justify-between items-center mb-4"><h2 class="text-xl font-bold">Pengaturan</h2><button class="btn btn-outline" style="padding:.25rem .5rem" onclick="document.getElementById('settingsModal').classList.remove('active')">✕</button></div><div class="form-group"><label>Tema</label><select id="themeSelect" onchange="Render.applyTheme(this.value)" class="w-full"><option value="light">🌞 Terang</option><option value="dark">🌙 Gelap</option><option value="auto">🔄 Otomatis (Sistem)</option></select></div><div class="form-group"><label>Rekening / Dompet</label><div class="flex gap-2 mb-2"><input type="text" id="newAccountName" placeholder="Nama rekening baru" class="w-full"><button class="btn btn-primary" onclick="App.addAccount()">+</button></div><div id="accountList" class="flex flex-col gap-2 max-h-40 overflow-y-auto"></div></div><div class="form-group"><label>🔄 Sinkronisasi Online (lintas perangkat)</label><div id="syncStatusLine" class="text-xs mb-2" style="opacity:.75"></div><input type="text" id="syncUrlInput" placeholder="URL Web App Apps Script (https://script.google.com/.../exec)" class="w-full mb-2"><input type="text" id="syncCodeInput" placeholder="Kode Keluarga (rahasia)" class="w-full mb-2"><div class="flex gap-2"><button class="btn btn-primary w-full" onclick="App.saveSyncConfig()">💾 Simpan &amp; Sambungkan</button><button class="btn btn-outline" onclick="App.disconnectSync()">✕</button></div><p class="text-xs text-slate-500 mt-2">Gratis, tanpa kartu kredit — lihat panduan Code.gs untuk cara membuatnya di Google Apps Script.</p></div><div class="form-group"><label>Backup Data</label><button class="btn btn-primary w-full" onclick="App.backupData()">📥 Unduh Backup (JSON)</button></div><div class="form-group"><label>Restore Data</label><input type="file" id="restoreFileInput" accept=".json" style="display:none" onchange="App.restoreData(event)"><button class="btn btn-outline w-full" onclick="document.getElementById('restoreFileInput').click()">📂 Pilih File JSON</button></div><p class="text-xs text-slate-500 mt-2">Backup mencakup transaksi, kategori, rekening, dan anggaran.</p></div></div>
 <div class="modal-overlay" id="budgetModal"><div class="modal-content"><div class="flex justify-between items-center mb-4"><h2 class="text-xl font-bold">Atur Anggaran</h2><button class="btn btn-outline" style="padding:.25rem .5rem" onclick="document.getElementById('budgetModal').classList.remove('active')">✕</button></div><div id="budgetFormList" class="flex flex-col gap-3 mb-4"></div><button class="btn btn-primary w-full" onclick="App.saveBudgets()">Simpan Anggaran</button></div></div>
 
 <script>
@@ -439,11 +439,140 @@ const Storage = {
             Render.all();
         } catch (e) { Notify.toast('Gagal memuat data', 'error'); Render.all(); }
     },
-    async save() { try { await localforage.setItem('bukuKas_data', State.data); Render.all(); } catch (e) { Notify.toast('Gagal menyimpan', 'error'); Render.all(); } },
-    async saveCategories() { try { await localforage.setItem('bukuKas_categories', categories); } catch (e) {} },
-    async saveBudgets() { try { await localforage.setItem('bukuKas_budgets', budgets); } catch (e) {} },
-    async saveAccounts() { try { await localforage.setItem('bukuKas_accounts', accounts); } catch (e) {} },
-    async saveIcons() { try { await localforage.setItem('bukuKas_icons', customIcons); } catch (e) {} }
+    async save() { try { await localforage.setItem('bukuKas_data', State.data); Render.all(); Sync.markDirty(); } catch (e) { Notify.toast('Gagal menyimpan', 'error'); Render.all(); } },
+    async saveCategories() { try { await localforage.setItem('bukuKas_categories', categories); Sync.markDirty(); } catch (e) {} },
+    async saveBudgets() { try { await localforage.setItem('bukuKas_budgets', budgets); Sync.markDirty(); } catch (e) {} },
+    async saveAccounts() { try { await localforage.setItem('bukuKas_accounts', accounts); Sync.markDirty(); } catch (e) {} },
+    async saveIcons() { try { await localforage.setItem('bukuKas_icons', customIcons); Sync.markDirty(); } catch (e) {} }
+};
+
+/**
+ * ═══════════════════════════════════════════════════════════
+ *  SYNC — Sinkronisasi online lintas perangkat via Google Apps Script
+ * ═══════════════════════════════════════════════════════════
+ *  Pola: near-realtime polling. Setiap perubahan lokal ditandai "dirty"
+ *  lalu dikirim (debounced) ke Apps Script. Setiap beberapa detik app
+ *  juga menarik versi terbaru dari server; kalau versi server lebih
+ *  baru dari versi lokal, data lokal ditimpa data server.
+ */
+const Sync = {
+    url: '', code: '',
+    localVersion: 0,
+    pushTimer: null,
+    pollTimer: null,
+    isPushing: false,
+    isDirtyLocally: false,
+    status: 'idle', // idle | syncing | synced | error | off
+
+    async init() {
+        this.url = localStorage.getItem('sync_url') || '';
+        this.code = localStorage.getItem('sync_code') || '';
+        this.localVersion = Number(localStorage.getItem('sync_version') || 0);
+        if (this.isConfigured()) {
+            await this.pull(true);
+            this.startPolling();
+        }
+    },
+    isConfigured() { return !!(this.url && this.code); },
+    setConfig(url, code) {
+        this.url = url.trim(); this.code = code.trim();
+        localStorage.setItem('sync_url', this.url);
+        localStorage.setItem('sync_code', this.code);
+        this.stopPolling();
+        if (this.isConfigured()) { this.pull(true); this.startPolling(); }
+    },
+    clearConfig() {
+        this.url = ''; this.code = '';
+        localStorage.removeItem('sync_url'); localStorage.removeItem('sync_code');
+        this.stopPolling(); this.status = 'off'; App._renderSyncStatus();
+    },
+    startPolling() {
+        this.stopPolling();
+        this.pollTimer = setInterval(() => { if (document.visibilityState === 'visible') this.pull(false); }, 5000);
+        document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && this.isConfigured()) this.pull(false); });
+    },
+    stopPolling() { if (this.pollTimer) clearInterval(this.pollTimer); this.pollTimer = null; },
+
+    markDirty() {
+        if (!this.isConfigured()) return;
+        this.isDirtyLocally = true;
+        if (this.pushTimer) clearTimeout(this.pushTimer);
+        this.pushTimer = setTimeout(() => this.push(), 1500);
+    },
+
+    async push() {
+        if (!this.isConfigured() || this.isPushing) return;
+        this.isPushing = true; this.status = 'syncing'; App._renderSyncStatus();
+        const settings = { categories, budgets, accounts, customIcons };
+        try {
+            const res = await fetch(this.url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // hindari CORS preflight di Apps Script
+                body: JSON.stringify({ code: this.code, data: State.data, settings })
+            });
+            const json = await res.json();
+            if (json.ok) {
+                this.localVersion = json.version;
+                localStorage.setItem('sync_version', this.localVersion);
+                this.isDirtyLocally = false;
+                this.status = 'synced';
+            } else {
+                this.status = 'error';
+                Notify.toast('Sync gagal: ' + (json.error || 'tidak diketahui'), 'error');
+            }
+        } catch (e) {
+            this.status = 'error'; // offline atau URL salah — data lokal tetap aman, akan dicoba lagi
+        } finally {
+            this.isPushing = false; App._renderSyncStatus();
+        }
+    },
+
+    async pull(isInitial) {
+        if (!this.isConfigured()) return;
+        this.status = 'syncing'; App._renderSyncStatus();
+        try {
+            const res = await fetch(`${this.url}?action=load&code=${encodeURIComponent(this.code)}`);
+            const json = await res.json();
+            if (!json.ok) { this.status = 'error'; Notify.toast('Sync gagal: ' + (json.error || 'tidak diketahui'), 'error'); App._renderSyncStatus(); return; }
+
+            // Saat pertama kali tersambung: adopsi apa pun yang ada di sheet sekarang,
+            // berapa pun nomor versinya (supaya data 1375 baris yang sudah ada langsung masuk).
+            // Kalau device ini sudah punya data lokal sendiri, minta konfirmasi dulu -
+            // supaya tidak ada transaksi lokal yang hilang tanpa sadar.
+            if (isInitial && State.data.length > 0 && Array.isArray(json.data)) {
+                const proceed = confirm(
+                    `Perangkat ini punya ${State.data.length} transaksi lokal, sedangkan sheet punya ${json.data.length} transaksi.\n\n` +
+                    `Lanjutkan akan MENGGANTI data lokal perangkat ini dengan data dari sheet (data lokal yang belum sempat tersinkron akan hilang).\n\n` +
+                    `Lanjutkan?`
+                );
+                if (!proceed) { this.clearConfig(); Notify.toast('Sinkronisasi dibatalkan, data lokal tetap aman', 'info'); return; }
+            }
+            const shouldAdopt = isInitial || (json.version > this.localVersion && !this.isDirtyLocally);
+            if (shouldAdopt && Array.isArray(json.data)) {
+                State.data = json.data;
+                const s = json.settings || {};
+                if (s.categories) categories = s.categories;
+                if (s.budgets) budgets = s.budgets;
+                if (s.accounts) accounts = s.accounts;
+                if (s.customIcons) customIcons = s.customIcons;
+                this.localVersion = json.version;
+                localStorage.setItem('sync_version', this.localVersion);
+                await localforage.setItem('bukuKas_data', State.data);
+                await localforage.setItem('bukuKas_categories', categories);
+                await localforage.setItem('bukuKas_budgets', budgets);
+                await localforage.setItem('bukuKas_accounts', accounts);
+                await localforage.setItem('bukuKas_icons', customIcons);
+                Render.all();
+                if (!isInitial) Notify.toast('Data diperbarui dari perangkat/sheet lain', 'info');
+                else if (State.data.length) Notify.toast(`Berhasil sinkron: ${State.data.length} transaksi dimuat dari sheet`, 'success');
+            }
+            this.status = 'synced';
+        } catch (e) {
+            this.status = 'error';
+        } finally {
+            App._renderSyncStatus();
+        }
+    }
 };
 
 const Voice = {
@@ -694,7 +823,7 @@ const App = {
     backupData() { /* ... */ },
     async restoreData(event) { /* ... */ },
     initEvents() { /* ... */ },
-    init() { this.initEvents(); Storage.init().then(() => Storage.loadAll()).then(() => Voice.init()).catch(err => { console.error(err); Notify.toast('Gagal memuat data', 'error'); }); }
+    init() { this.initEvents(); Storage.init().then(() => Storage.loadAll()).then(() => Voice.init()).then(() => Sync.init()).catch(err => { console.error(err); Notify.toast('Gagal memuat data', 'error'); }); }
 };
 
 // Isi fungsi yang tidak berubah agar lengkap (disalin dari kode sebelumnya yang sudah stabil)
@@ -731,7 +860,35 @@ App._deleteCategory = function(type, idx) { if (confirm('Hapus kategori ini?')) 
 App._renderAccountList = function() { const list = document.getElementById('accountList'); if (!list) return; list.innerHTML = ''; accounts.forEach((a, i) => { list.innerHTML += `<div class="cat-item"><span class="text-slate-800 w-full">🏦 ${Utils.escapeHTML(a)}</span>${accounts.length > 1 ? `<button class="btn btn-outline" style="padding:.25rem .5rem;color:var(--red-600);border-color:var(--red-100);flex-shrink:0;" onclick="App._deleteAccount(${i})">Hapus</button>` : ''}</div>`; }); };
 App.addAccount = function() { const name = document.getElementById('newAccountName').value.trim(); if (!name) return; if (accounts.some(a => a.toLowerCase() === name.toLowerCase())) return Notify.toast('Rekening sudah ada', 'error'); accounts.push(name); Storage.saveAccounts(); document.getElementById('newAccountName').value = ''; App._renderAccountList(); Notify.toast('"' + name + '" ditambahkan'); };
 App._deleteAccount = function(i) { if (accounts.length <= 1) return Notify.toast('Minimal satu rekening', 'error'); if (confirm('Hapus rekening "' + accounts[i] + '"?')) { accounts.splice(i, 1); Storage.saveAccounts(); App._renderAccountList(); } };
-App.openSettings = function() { document.getElementById('settingsModal').classList.add('active'); const sel = document.getElementById('themeSelect'); if (sel) sel.value = localStorage.getItem('theme') || 'light'; App._renderAccountList(); };
+App.openSettings = function() { document.getElementById('settingsModal').classList.add('active'); const sel = document.getElementById('themeSelect'); if (sel) sel.value = localStorage.getItem('theme') || 'light'; App._renderAccountList(); document.getElementById('syncUrlInput').value = Sync.url; document.getElementById('syncCodeInput').value = Sync.code; App._renderSyncStatus(); };
+App.saveSyncConfig = function() {
+    const url = document.getElementById('syncUrlInput').value.trim();
+    const code = document.getElementById('syncCodeInput').value.trim();
+    if (!url || !code) return Notify.toast('Isi URL dan Kode Keluarga dulu', 'error');
+    if (!url.startsWith('https://script.google.com/')) return Notify.toast('URL sepertinya bukan URL Apps Script yang valid', 'error');
+    Sync.setConfig(url, code);
+    Notify.toast('Menyambungkan ke sinkronisasi online...', 'info');
+};
+App.disconnectSync = function() {
+    if (!Sync.isConfigured()) return;
+    if (!confirm('Putuskan sinkronisasi online? Data di perangkat ini tetap tersimpan lokal.')) return;
+    Sync.clearConfig();
+    document.getElementById('syncUrlInput').value = '';
+    document.getElementById('syncCodeInput').value = '';
+    Notify.toast('Sinkronisasi online dinonaktifkan');
+};
+App._renderSyncStatus = function() {
+    const el = document.getElementById('syncStatusLine');
+    if (!el) return;
+    const map = {
+        idle: '⚪ Belum tersambung',
+        off: '⚪ Sinkronisasi dimatikan',
+        syncing: '🔄 Menyinkronkan...',
+        synced: '🟢 Tersambung — versi #' + Sync.localVersion,
+        error: '🔴 Gagal terhubung (cek URL/kode, atau sedang offline)'
+    };
+    el.textContent = Sync.isConfigured() ? (map[Sync.status] || map.idle) : map.idle;
+};
 App.openBudgetModal = function() { const list = document.getElementById('budgetFormList'); list.innerHTML = ''; (categories.pengeluaran || []).forEach(cat => { const limit = budgets[cat] || ''; list.innerHTML += `<div class="flex items-center gap-2 mb-2"><span class="text-sm text-slate-700" style="width:9rem;flex-shrink:0;">${getCatIcon(cat)} ${Utils.escapeHTML(cat)}</span><input type="text" class="budget-input w-full" data-category="${Utils.escapeHTML(cat)}" value="${limit ? Utils.formatNumber(limit) : ''}" placeholder="Batas (Rp)" inputmode="numeric"></div>`; }); document.querySelectorAll('.budget-input').forEach(inp => { inp.addEventListener('input', function() { let v = this.value.replace(/[^0-9]/g, ''); this.value = v ? Utils.formatNumber(v) : ''; }); }); document.getElementById('budgetModal').classList.add('active'); };
 App.saveBudgets = function() { document.querySelectorAll('.budget-input').forEach(inp => { const cat = inp.dataset.category, val = Utils.parseCurrency(inp.value); if (val !== null && val > 0) budgets[cat] = val; else delete budgets[cat]; }); Storage.saveBudgets(); Render.budgetDisplay(); document.getElementById('budgetModal').classList.remove('active'); Notify.toast('Anggaran disimpan'); };
 App.exportPDF = function() { if (typeof html2pdf === 'undefined') return Notify.toast('Library belum dimuat', 'error'); const el = document.getElementById('areaLaporanPDF'); const dark = document.body.classList.contains('dark'); Notify.toast('Menyiapkan PDF...', 'info'); html2pdf().set({ margin: 0.5, filename: `Laporan-${State.lapMonth}.pdf`, image: { type: 'jpeg', quality: .98 }, html2canvas: { scale: 2, backgroundColor: dark ? '#0f172a' : '#f8fafc' }, jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' } }).from(el).save(); };
