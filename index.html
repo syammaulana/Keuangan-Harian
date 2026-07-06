@@ -222,7 +222,6 @@ const State = {
     currentMonth: '', lapMonth: '', calMonth: '', selectedDate: ''
 };
 
-    
 // ══════════════════════════════════════════════
 // UTILS (perbaikan di parseCurrency, parseNominal, dll)
 // ══════════════════════════════════════════════
@@ -236,7 +235,7 @@ const Utils = {
     },
     getLocalDateString() { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; },
     offsetDate(base, days) { const d = new Date(base); d.setDate(d.getDate() + days); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; },
-    formatDateSafe(s, opts) { if (!s) return ''; const [y, m, d] = s.split('-').map(Number); const date = new Date(y, m-1, d); if (isNaN(date)) return ''; return date.toLocaleDateString('id-ID', opts); },
+    formatDateSafe(s, opts) { if (!s) return ''; const parts = s.split('-').map(Number); const y = parts[0], m = parts[1], d = parts.length >= 3 ? parts[2] : 1; const date = new Date(y, m-1, d); if (isNaN(date.getTime())) return ''; return date.toLocaleDateString('id-ID', opts); },
     generateUUID() { if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID(); return Date.now().toString(36) + '-' + Math.random().toString(36).substring(2, 9); },
     capitalize(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : ''; },
     escapeHTML(str) { return String(str).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m]); },
@@ -463,16 +462,24 @@ const Sync = {
     pollTimer: null,
     isPushing: false,
     isDirtyLocally: false,
+    pendingDeletes: [],
     status: 'idle', // idle | syncing | synced | error | off
 
     async init() {
         this.url = localStorage.getItem('sync_url') || '';
         this.code = localStorage.getItem('sync_code') || '';
         this.localVersion = Number(localStorage.getItem('sync_version') || 0);
+        try { this.pendingDeletes = JSON.parse(localStorage.getItem('sync_pending_deletes') || '[]'); } catch (e) { this.pendingDeletes = []; }
         if (this.isConfigured()) {
             await this.pull(true);
             this.startPolling();
         }
+    },
+    recordDelete(id) {
+        if (!id || !this.isConfigured()) return;
+        if (!this.pendingDeletes.includes(id)) this.pendingDeletes.push(id);
+        localStorage.setItem('sync_pending_deletes', JSON.stringify(this.pendingDeletes));
+        this.markDirty();
     },
     isConfigured() { return !!this.url; },
     setConfig(url, code) {
@@ -505,17 +512,21 @@ const Sync = {
         if (!this.isConfigured() || this.isPushing) return;
         this.isPushing = true; this.status = 'syncing'; App._renderSyncStatus();
         const settings = { categories, budgets, accounts, customIcons };
+        const deletedIds = this.pendingDeletes.slice();
         try {
             const res = await fetch(this.url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // hindari CORS preflight di Apps Script
-                body: JSON.stringify({ code: this.code, data: State.data, settings })
+                body: JSON.stringify({ code: this.code, data: State.data, deletedIds, settings })
             });
             const json = await res.json();
             if (json.ok) {
                 this.localVersion = json.version;
                 localStorage.setItem('sync_version', this.localVersion);
                 this.isDirtyLocally = false;
+                // Hanya buang ID yang memang barusan dikirim -> aman kalau ada penghapusan baru menyusul saat push berlangsung.
+                this.pendingDeletes = this.pendingDeletes.filter(id => !deletedIds.includes(id));
+                localStorage.setItem('sync_pending_deletes', JSON.stringify(this.pendingDeletes));
                 this.status = 'synced';
             } else {
                 this.status = 'error';
@@ -838,7 +849,7 @@ App.saveQuickTransaction = function(e) {
     if (id) { const i = State.data.findIndex(x => x.id === id); if (i > -1) State.data[i] = tx; } else State.data.push(tx);
     Storage.save(); App.closeQuickModal(); Notify.toast('✅ Transaksi disimpan');
 };
-App.deleteFromQuick = function() { const id = document.getElementById('qId').value; if (!id) return; if (confirm('Hapus transaksi ini?')) { State.data = State.data.filter(x => x.id !== id); Storage.save(); App.closeQuickModal(); Notify.toast('Transaksi dihapus'); } };
+App.deleteFromQuick = function() { const id = document.getElementById('qId').value; if (!id) return; if (confirm('Hapus transaksi ini?')) { State.data = State.data.filter(x => x.id !== id); Sync.recordDelete(id); Storage.save(); App.closeQuickModal(); Notify.toast('Transaksi dihapus'); } };
 App.openAddModal = function() { document.getElementById('addForm').reset(); document.getElementById('modalId').value = ''; document.getElementById('btnDelete').style.display = 'none'; document.getElementById('modalTitle').textContent = 'Tambah Transaksi'; document.getElementById('modalTanggal').value = Utils.getLocalDateString(); App.setModalType('pengeluaran'); App._fillAccounts('modalAccount'); document.getElementById('addModal').classList.add('active'); };
 App.closeAddModal = function() { document.getElementById('addForm').reset(); document.getElementById('modalId').value = ''; document.getElementById('btnDelete').style.display = 'none'; document.getElementById('addModal').classList.remove('active'); const prev = document.getElementById('nlpPreview'); if (prev) { prev.textContent = ''; prev.classList.remove('show'); } };
 App.setModalType = function(type) { document.querySelectorAll('#addModal .tab').forEach(b => b.classList.remove('active')); document.querySelector(`#addModal .tab[data-val="${type}"]`).classList.add('active'); App._updateCatSelect(type); };
@@ -852,7 +863,7 @@ App.saveTransaction = function(e) {
     if (id) { const i = State.data.findIndex(x => x.id === id); if (i > -1) State.data[i] = tx; } else State.data.push(tx);
     Storage.save(); App.closeAddModal(); Notify.toast('Transaksi disimpan');
 };
-App.deleteTransaction = function() { const id = document.getElementById('modalId').value; if (!id) return; if (confirm('Hapus transaksi ini?')) { State.data = State.data.filter(x => x.id !== id); Storage.save(); App.closeAddModal(); Notify.toast('Transaksi dihapus'); } };
+App.deleteTransaction = function() { const id = document.getElementById('modalId').value; if (!id) return; if (confirm('Hapus transaksi ini?')) { State.data = State.data.filter(x => x.id !== id); Sync.recordDelete(id); Storage.save(); App.closeAddModal(); Notify.toast('Transaksi dihapus'); } };
 App.openCategoryModal = function(type) { ['quickModal','addModal'].forEach(id => document.getElementById(id).classList.remove('active')); document.querySelectorAll('.cat-tab').forEach(b => b.classList.toggle('active', b.dataset.type === type)); App._renderCatList(type); document.getElementById('categoryModal').classList.add('active'); };
 App.switchCategoryTab = function(btn, type) { document.querySelectorAll('.cat-tab').forEach(b => b.classList.remove('active')); btn.classList.add('active'); App._renderCatList(type); };
 App._renderCatList = function(type) { const list = document.getElementById('categoryList'); list.innerHTML = ''; (categories[type] || []).forEach((c, i) => { list.innerHTML += `<div class="cat-item"><span style="font-size:1.25rem">${getCatIcon(c)}</span><span class="text-slate-800 w-full ml-2">${Utils.escapeHTML(c)}</span><button class="btn btn-outline" style="padding:.25rem .5rem;color:var(--red-600);border-color:var(--red-100);flex-shrink:0;" onclick="App._deleteCategory('${type}',${i})">Hapus</button></div>`; }); };
