@@ -543,7 +543,7 @@ const Sync = {
         if (!this.isConfigured()) return;
         this.status = 'syncing'; App._renderSyncStatus();
         try {
-            const res = await fetch(`${this.url}?action=load&code=${encodeURIComponent(this.code)}`);
+            const res = await fetch(`${this.url}?action=load&code=${encodeURIComponent(this.code)}&_=${Date.now()}`, { cache: 'no-store' });
             const json = await res.json();
             if (!json.ok) { this.status = 'error'; Notify.toast('Sync gagal: ' + (json.error || 'tidak diketahui'), 'error'); App._renderSyncStatus(); return; }
 
