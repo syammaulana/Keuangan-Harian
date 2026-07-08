@@ -496,7 +496,8 @@ const Sync = {
     },
     startPolling() {
         this.stopPolling();
-        this.pollTimer = setInterval(() => { if (document.visibilityState === 'visible') this.pull(false); }, 5000);
+        // Interval 10 detik + jitter acak 0-2 detik supaya beberapa perangkat tidak polling di detik yang sama persis (mengurangi tabrakan lock di server).
+        this.pollTimer = setInterval(() => { if (document.visibilityState === 'visible') this.pull(false); }, 10000 + Math.floor(Math.random() * 2000));
         document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && this.isConfigured()) this.pull(false); });
     },
     stopPolling() { if (this.pollTimer) clearInterval(this.pollTimer); this.pollTimer = null; },
