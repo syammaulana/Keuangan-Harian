@@ -692,7 +692,7 @@ const AppCalendar = {
 
 const Render = {
     all() { this.filterData(); this.dashboard(); this.categoryGrids(); this.transactions(); this.budgetDisplay(); this.statistics(); AppChart.safeUpdate(); AppCalendar.safeUpdate(); },
-    filterData() { State.filteredData = State.data.filter(t => t.date && t.date.startsWith(State.currentMonth)).sort((a, b) => new Date(b.date) - new Date(a.date)); },
+    filterData() { State.filteredData = State.data.filter(t => t.date && t.date.startsWith(State.currentMonth)).reverse(); }, // reverse() -> transaksi yang paling baru DIINPUT muncul paling atas (bukan berdasarkan tanggal transaksinya)
     dashboard() {
         document.getElementById('headerMonth').textContent = Utils.formatDateSafe(State.currentMonth, { month: 'long', year: 'numeric' });
         let pem = 0, peng = 0; State.filteredData.forEach(t => t.type === 'pemasukan' ? pem += t.amount : peng += t.amount);
