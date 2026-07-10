@@ -463,6 +463,8 @@ const Sync = {
     isPushing: false,
     isDirtyLocally: false,
     pendingDeletes: [],
+    localChangeSeq: 0,   // nomor urut tiap perubahan lokal
+    lastPushedSeq: -1,   // nomor urut terakhir yang berhasil ke-push penuh
     status: 'idle', // idle | syncing | synced | error | off
 
     async init() {
@@ -511,12 +513,14 @@ const Sync = {
     markDirty() {
         if (!this.isConfigured()) return;
         this.isDirtyLocally = true;
+        this.localChangeSeq++;
         if (this.pushTimer) clearTimeout(this.pushTimer);
         this.pushTimer = setTimeout(() => this.push(), 1500);
     },
 
     async push() {
         if (!this.isConfigured() || this.isPushing) return;
+        const seqAtStart = this.localChangeSeq; // tandai "sejauh mana" data yang mau dikirim kali ini
         this.isPushing = true; this.status = 'syncing'; App._renderSyncStatus();
         const settings = { categories, budgets, accounts, customIcons };
         const deletedIds = this.pendingDeletes.slice();
@@ -530,7 +534,16 @@ const Sync = {
             if (json.ok) {
                 this.localVersion = json.version;
                 localStorage.setItem('sync_version', this.localVersion);
-                this.isDirtyLocally = false;
+                // PENTING: kalau ada perubahan baru masuk SELAGI push ini berlangsung (localChangeSeq sudah naik
+                // lagi dibanding saat push dimulai), JANGAN anggap semua sudah tersimpan -> tetap dirty, dan
+                // langsung jadwalkan push susulan segera (jangan tunggu poll berikutnya yang bisa ~10 detik lagi).
+                if (this.localChangeSeq === seqAtStart) {
+                    this.isDirtyLocally = false;
+                } else {
+                    this.isDirtyLocally = true;
+                    if (this.pushTimer) clearTimeout(this.pushTimer);
+                    this.pushTimer = setTimeout(() => this.push(), 400);
+                }
                 // Hanya buang ID yang memang barusan dikirim -> aman kalau ada penghapusan baru menyusul saat push berlangsung.
                 this.pendingDeletes = this.pendingDeletes.filter(id => !deletedIds.includes(id));
                 localStorage.setItem('sync_pending_deletes', JSON.stringify(this.pendingDeletes));
