@@ -489,7 +489,19 @@ const Sync = {
         localStorage.setItem('sync_url', this.url);
         localStorage.setItem('sync_code', this.code);
         this.stopPolling();
-        if (this.isConfigured()) { this.pull(true); this.startPolling(); }
+        if (this.isConfigured()) { this.connectSafely(); }
+    },
+    async connectSafely() {
+        // Kirim dulu data lokal ke server (upsert-only, tidak pernah menghapus apa pun di sheet)
+        // SEBELUM menarik data dari server -> supaya transaksi lokal yang belum sempat sync
+        // (misal karena URL/kode sempat kosong) aman masuk ke sheet duluan, tidak berisiko
+        // tertimpa oleh dialog konfirmasi "ganti data lokal dengan data sheet".
+        if (State.data.length > 0) {
+            this.markDirty();
+            await this.push();
+        }
+        await this.pull(true);
+        this.startPolling();
     },
     clearConfig() {
         this.url = ''; this.code = '';
