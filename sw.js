@@ -10,7 +10,7 @@
 // ──────────────────────────────────────────────
 
 /** Nama unik cache — ganti versi saat deployment untuk memicu update */
-const CACHE_NAME = 'buku-kas-v2.1.8';
+const CACHE_NAME = 'buku-kas-v2.1.9';
 
 /** Daftar aset statis yang langsung di-cache saat instalasi */
 const PRECACHE_ASSETS = [
